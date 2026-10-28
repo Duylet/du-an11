@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Bảng điều khiển{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">TỔNG QUAN</p><h1>Bảng điều khiển</h1><p class="muted">Chào mừng bạn đến với hệ thống quản lý doanh nghiệp.</p></div><a class="button" href="{{ url_for('orders') }}">＋ Tạo đơn hàng</a></div>
+<div class="stats">
+  <article class="stat-card"><span class="stat-icon purple">▤</span><p>Sản phẩm</p><strong>{{ stats.products }}</strong><small>mặt hàng trong hệ thống</small></article>
+  <article class="stat-card"><span class="stat-icon blue">♙</span><p>Khách hàng</p><strong>{{ stats.customers }}</strong><small>khách hàng đã lưu</small></article>
+  <article class="stat-card"><span class="stat-icon orange">▧</span><p>Đơn hàng</p><strong>{{ stats.orders }}</strong><small>tổng số đơn đã tạo</small></article>
+  <article class="stat-card"><span class="stat-icon green">₫</span><p>Doanh thu đơn hàng</p><strong class="revenue">{{ stats.revenue|money }}</strong><small>tổng giá trị đơn hàng, gồm cả đơn hủy</small></article>
+</div>
+<div class="notice {% if stats.low_stock %}warning{% endif %}">ⓘ &nbsp; Có <strong>{{ stats.low_stock }}</strong> sản phẩm có tồn kho từ 5 trở xuống.</div>
+<section class="panel"><div class="panel-heading"><div><h2>Đơn hàng gần đây</h2><p class="muted">Những giao dịch mới nhất trong hệ thống</p></div><a class="text-link" href="{{ url_for('orders') }}">Xem tất cả →</a></div>
+{% if recent_orders %}<div class="table-wrap"><table><thead><tr><th>MÃ ĐƠN</th><th>KHÁCH HÀNG</th><th>SẢN PHẨM</th><th>NGÀY TẠO</th><th>TỔNG TIỀN</th><th>TRẠNG THÁI</th></tr></thead><tbody>{% for order in recent_orders %}<tr><td>#DH{{ '%04d'|format(order.id) }}</td><td>{{ order.customer_name }}</td><td>{{ order.product_name }} × {{ order.quantity }}</td><td>{{ order.created_at }}</td><td class="amount">{{ order.total|money }}</td><td><span class="status">{{ order.status }}</span></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty">Chưa có đơn hàng. Hãy thêm sản phẩm, khách hàng rồi tạo đơn hàng đầu tiên.</div>{% endif %}
+</section>
+{% endblock %}
