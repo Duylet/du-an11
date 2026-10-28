@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Mini ERP{% endblock %} · Mini ERP</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark">E</span><span>Mini ERP<small>QUẢN TRỊ DOANH NGHIỆP</small></span></a>
+    <div class="nav-label">TỔNG QUAN</div>
+    <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">▦ &nbsp; Bảng điều khiển</a>
+    <div class="nav-label">QUẢN LÝ</div>
+    <a class="nav-link {% if request.endpoint in ['products','update_stock','delete_product'] %}active{% endif %}" href="{{ url_for('products') }}">▤ &nbsp; Sản phẩm & kho</a>
+    <a class="nav-link {% if request.endpoint in ['customers','delete_customer'] %}active{% endif %}" href="{{ url_for('customers') }}">♙ &nbsp; Khách hàng</a>
+    <a class="nav-link {% if request.endpoint in ['orders','order_status'] %}active{% endif %}" href="{{ url_for('orders') }}">▧ &nbsp; Đơn hàng</a>
+    <div class="sidebar-note">Bản demo học tập<br>Flask + SQLite</div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><span>Hệ thống quản lý ERP</span><span class="user-chip">AD &nbsp; Quản trị viên</span></header>
+    <section class="page">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}<div class="messages">{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+      <footer>Mini ERP Demo · Dữ liệu lưu cục bộ trong SQLite</footer>
+    </section>
+  </main>
+</body>
+</html>
