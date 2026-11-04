@@ -1,15 +1,16 @@
 {% extends "base.html" %}
-{% block title %}Bảng điều khiển{% endblock %}
+{% block title %}Tổng quan{% endblock %}
 {% block content %}
-<div class="page-heading"><div><p class="eyebrow">TỔNG QUAN</p><h1>Bảng điều khiển</h1><p class="muted">Chào mừng bạn đến với hệ thống quản lý doanh nghiệp.</p></div><a class="button" href="{{ url_for('orders') }}">＋ Tạo đơn hàng</a></div>
-<div class="stats">
-  <article class="stat-card"><span class="stat-icon purple">▤</span><p>Sản phẩm</p><strong>{{ stats.products }}</strong><small>mặt hàng trong hệ thống</small></article>
-  <article class="stat-card"><span class="stat-icon blue">♙</span><p>Khách hàng</p><strong>{{ stats.customers }}</strong><small>khách hàng đã lưu</small></article>
-  <article class="stat-card"><span class="stat-icon orange">▧</span><p>Đơn hàng</p><strong>{{ stats.orders }}</strong><small>tổng số đơn đã tạo</small></article>
-  <article class="stat-card"><span class="stat-icon green">₫</span><p>Doanh thu đơn hàng</p><strong class="revenue">{{ stats.revenue|money }}</strong><small>tổng giá trị đơn hàng, gồm cả đơn hủy</small></article>
+<div class="welcome-row"><div><p class="eyebrow">TỔNG QUAN / WORKSPACE</p><h1>Chào ngày mới, {{ current_user.username }} <span class="wave">✦</span></h1><p class="muted">Đây là tình hình hoạt động của doanh nghiệp hôm nay.</p></div><a class="button" href="{{ url_for('orders') }}">＋ Tạo đơn hàng</a></div>
+<div class="stats-grid">
+  <article class="stat-card"><div class="stat-top"><span class="stat-label">SẢN PHẨM</span><span class="stat-symbol purple">▦</span></div><strong>{{ stats.products }}</strong><small>mặt hàng trong danh mục</small></article>
+  <article class="stat-card"><div class="stat-top"><span class="stat-label">KHÁCH HÀNG</span><span class="stat-symbol blue">♙</span></div><strong>{{ stats.customers }}</strong><small>hồ sơ khách hàng</small></article>
+  <article class="stat-card"><div class="stat-top"><span class="stat-label">ĐƠN HÀNG</span><span class="stat-symbol amber">▤</span></div><strong>{{ stats.orders }}</strong><small>tổng số đơn đã tạo</small></article>
+  <article class="stat-card revenue-card"><div class="stat-top"><span class="stat-label">DOANH THU HOÀN THÀNH</span><span class="stat-symbol green">₫</span></div><strong>{{ stats.revenue|money }}</strong><small>không bao gồm đơn bị hủy</small></article>
 </div>
-<div class="notice {% if stats.low_stock %}warning{% endif %}">ⓘ &nbsp; Có <strong>{{ stats.low_stock }}</strong> sản phẩm có tồn kho từ 5 trở xuống.</div>
-<section class="panel"><div class="panel-heading"><div><h2>Đơn hàng gần đây</h2><p class="muted">Những giao dịch mới nhất trong hệ thống</p></div><a class="text-link" href="{{ url_for('orders') }}">Xem tất cả →</a></div>
-{% if recent_orders %}<div class="table-wrap"><table><thead><tr><th>MÃ ĐƠN</th><th>KHÁCH HÀNG</th><th>SẢN PHẨM</th><th>NGÀY TẠO</th><th>TỔNG TIỀN</th><th>TRẠNG THÁI</th></tr></thead><tbody>{% for order in recent_orders %}<tr><td>#DH{{ '%04d'|format(order.id) }}</td><td>{{ order.customer_name }}</td><td>{{ order.product_name }} × {{ order.quantity }}</td><td>{{ order.created_at }}</td><td class="amount">{{ order.total|money }}</td><td><span class="status">{{ order.status }}</span></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty">Chưa có đơn hàng. Hãy thêm sản phẩm, khách hàng rồi tạo đơn hàng đầu tiên.</div>{% endif %}
+<div class="summary-strip"><div><span class="strip-icon">↗</span><div><small>Giá trị đơn đang xử lý</small><strong>{{ stats.pipeline|money }}</strong></div></div><div><span class="strip-icon alert-icon">!</span><div><small>Sản phẩm sắp hết hàng</small><strong>{{ stats.low_stock }} mặt hàng</strong></div><a href="{{ url_for('products') }}">Kiểm tra kho →</a></div></div>
+<section class="panel">
+  <div class="panel-heading"><div><p class="eyebrow">HOẠT ĐỘNG</p><h2>Đơn hàng gần đây</h2><p class="muted">Các đơn hàng mới nhất được ghi nhận trong hệ thống.</p></div><a class="text-link" href="{{ url_for('orders') }}">Tất cả đơn hàng →</a></div>
+  {% if recent_orders %}<div class="table-wrap"><table><thead><tr><th>MÃ ĐƠN</th><th>KHÁCH HÀNG</th><th>SẢN PHẨM</th><th>NGÀY TẠO</th><th>GIÁ TRỊ</th><th>TRẠNG THÁI</th></tr></thead><tbody>{% for order in recent_orders %}<tr><td><span class="code">#DH{{ '%04d'|format(order.id) }}</span></td><td class="primary-cell">{{ order.customer_name }}</td><td>{{ order.product_name }} × {{ order.quantity }}</td><td>{{ order.created_at[:16] }}</td><td class="amount">{{ order.total|money }}</td><td><span class="status status-{{ 'done' if order.status == 'Hoàn thành' else 'cancel' if order.status == 'Đã hủy' else 'pending' }}">{{ order.status }}</span></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state"><span>▤</span><strong>Chưa có đơn hàng</strong><p>Tạo đơn đầu tiên sau khi thêm sản phẩm và khách hàng.</p><a href="{{ url_for('orders') }}">Tạo đơn hàng →</a></div>{% endif %}
 </section>
 {% endblock %}
