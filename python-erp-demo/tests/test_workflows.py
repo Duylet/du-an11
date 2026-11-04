@@ -95,3 +95,10 @@ def test_completed_revenue_excludes_cancelled_orders(client):
     response = client.get("/")
     assert response.status_code == 200
     assert b"DOANH THU HOÀN THÀNH" in response.data
+
+
+def test_csrf_rejects_post_without_token(client):
+    app.config["WTF_CSRF_ENABLED"] = True
+    response = client.post("/login", data={"username": "tester", "password": "test-password"})
+    assert response.status_code == 400
+    app.config["WTF_CSRF_ENABLED"] = False
