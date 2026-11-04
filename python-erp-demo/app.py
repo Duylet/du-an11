@@ -1,7 +1,6 @@
 import os
 import sqlite3
 from datetime import datetime
-from functools import wraps
 
 import click
 from flask import Flask, abort, flash, g, redirect, render_template, request, url_for
@@ -174,7 +173,10 @@ def login():
         if row and check_password_hash(row["password_hash"], password):
             login_user(User(row), remember=bool(request.form.get("remember")))
             flash("Đăng nhập thành công.", "success")
-            return redirect(request.args.get("next") or url_for("dashboard"))
+            next_url = request.args.get("next", "")
+            if next_url.startswith("/") and not next_url.startswith("//"):
+                return redirect(next_url)
+            return redirect(url_for("dashboard"))
         flash("Tên đăng nhập hoặc mật khẩu không đúng.", "error")
     return render_template("login.html")
 
