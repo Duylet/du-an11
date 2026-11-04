@@ -1,87 +1,99 @@
-# Mini ERP Demo — Python Flask + SQLite
+# Duylet ERP — Mini ERP 2.0
 
-Ứng dụng quản lý doanh nghiệp đơn giản viết bằng **Python Flask** và **SQLite**, chạy trực tiếp trên Windows trong VS Code. Đây là dự án học tập độc lập, không cần Docker, MariaDB hay Redis.
+Mini ERP phục vụ học tập, xây dựng bằng **Python Flask + SQLite** với giao diện responsive, đăng nhập quản trị và lịch sử biến động kho.
 
-## Chức năng
+## Tính năng
+- Đăng nhập quản trị; mật khẩu được băm bằng Werkzeug.
+- Dashboard: KPI, doanh thu từ đơn hoàn thành, giá trị đơn đang xử lý và cảnh báo tồn kho.
+- Sản phẩm: thêm, sửa tên/giá, tìm kiếm, điều chỉnh tồn kho.
+- Khách hàng: thêm, sửa, tìm kiếm và xóa nếu chưa có đơn hàng.
+- Đơn hàng: kiểm tra tồn kho trong giao dịch SQLite, theo dõi trạng thái, hoàn kho đúng một lần khi hủy.
+- Lịch sử nhập/xuất/điều chỉnh kho.
+- CSRF protection cho các thao tác POST.
 
-- **Bảng điều khiển:** tổng số sản phẩm, khách hàng, đơn hàng, tổng giá trị đơn và cảnh báo tồn kho thấp.
-- **Sản phẩm & kho:** thêm sản phẩm, SKU duy nhất, giá bán, tồn kho; tăng/giảm tồn kho; không cho tồn kho âm.
-- **Khách hàng:** thêm và xem tên, email, số điện thoại.
-- **Đơn hàng:** tạo đơn cho khách hàng và sản phẩm; tự kiểm tra tồn kho, tính tổng tiền và trừ kho khi đặt hàng; đổi trạng thái đơn. Hủy đơn sẽ hoàn kho.
-- **SQLite:** tự tạo cơ sở dữ liệu `erp_demo.db` ở lần chạy đầu tiên.
+> Đây là dự án học tập/local. Chưa phải ERP production, chưa có phân quyền chi tiết, nhiều dòng sản phẩm trong một đơn, hóa đơn điện tử hoặc kế toán.
 
 ## Yêu cầu
+- Windows 10/11, Python 3.11+, Git, VS Code và extension Python.
 
-- Windows 10/11
-- Python 3.11 trở lên (khuyến nghị)
-- Git và VS Code
-- VS Code extension **Python** (Microsoft)
+## Cài đặt và chạy trên Windows + VS Code
 
-## Chạy trên Windows + VS Code
+Mở PowerShell:
 
-Mở PowerShell ở thư mục bạn muốn lưu dự án:
-
-```powershell
+~~~powershell
 git clone https://github.com/Duylet/du-an11.git
-cd du-an11
-cd python-erp-demo
+cd du-an11\python-erp-demo
+
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+
+python -m flask --app app init-db
+python -m flask --app app create-admin --username admin
 python app.py
-```
+~~~
 
-Nếu PowerShell chặn kích hoạt môi trường ảo, bạn có thể bỏ qua bước Activate và gọi Python trong môi trường ảo trực tiếp:
+Lệnh tạo admin sẽ yêu cầu nhập mật khẩu. Mở http://127.0.0.1:5000 và đăng nhập bằng tài khoản vừa tạo.
 
-```powershell
+### Nếu PowerShell chặn Activate.ps1
+
+~~~powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m flask --app app init-db
+.\.venv\Scripts\python.exe -m flask --app app create-admin --username admin
 .\.venv\Scripts\python.exe app.py
-```
+~~~
 
-Mở trình duyệt tại **http://127.0.0.1:5000**. Giữ cửa sổ terminal đang chạy ứng dụng. Nhấn **Ctrl+C** trong terminal để dừng.
+### Trong VS Code
+1. File → Open Folder..., mở thư mục python-erp-demo.
+2. Ctrl+Shift+P → Python: Select Interpreter → chọn .venv.
+3. Terminal → New Terminal.
+4. Chạy các lệnh cài đặt, init-db, create-admin ở trên.
+5. Chạy python app.py; mở URL localhost trong trình duyệt.
+6. Dừng máy chủ bằng Ctrl+C.
 
-### Mở bằng VS Code
+### Khóa bí mật
 
-1. Chọn **File → Open Folder...** và mở thư mục `python-erp-demo`.
-2. Mở Terminal → New Terminal.
-3. Chạy các lệnh tạo môi trường và cài thư viện ở trên.
-4. Chạy `python app.py`, rồi mở địa chỉ localhost trong trình duyệt.
+~~~powershell
+$env:SECRET_KEY = (python -c "import secrets; print(secrets.token_hex(32))")
+~~~
 
-## Dùng thử
+Đặt biến trước khi chạy ứng dụng trong cùng terminal. Không commit khóa bí mật hoặc tệp .env. Debug mặc định tắt; chỉ bật local khi cần bằng $env:FLASK_DEBUG="1".
 
-1. Vào **Sản phẩm & kho**, thêm sản phẩm ví dụ: SKU `SP-001`, tên `Bàn phím`, giá `250000`, tồn kho `20`.
-2. Vào **Khách hàng**, thêm một khách hàng thử nghiệm.
-3. Vào **Đơn hàng**, chọn khách hàng và sản phẩm, nhập số lượng rồi tạo đơn.
-4. Quay lại **Sản phẩm & kho** để thấy tồn kho giảm.
-5. Thử đổi trạng thái đơn sang **Đã hủy**; số lượng hàng sẽ được hoàn lại kho.
+## Kiểm thử
+
+~~~powershell
+pip install pytest
+pytest
+~~~
 
 ## Cấu trúc
 
-```text
+~~~text
 python-erp-demo/
 ├── app.py
 ├── requirements.txt
-├── .gitignore
-├── README.md
-├── erp_demo.db          # tự sinh khi chạy, không commit lên Git
+├── erp_demo.db
 ├── templates/
 │   ├── base.html
+│   ├── login.html
 │   ├── dashboard.html
 │   └── module.html
-└── static/
-    └── style.css
-```
+├── static/style.css
+└── tests/test_workflows.py
+~~~
 
-## Lưu ý
+Database nằm tại erp_demo.db. Bản nâng cấp bổ sung bảng users, stock_movements và cột updated_at; hãy sao lưu database cũ trước khi nâng cấp nếu dữ liệu quan trọng.
 
-- Đây là demo chạy local, chưa có đăng nhập/phân quyền, hóa đơn thuế, kế toán kép hay bảo mật dành cho triển khai thực tế.
-- Dữ liệu được lưu trong `erp_demo.db`. Sao lưu tệp này nếu cần giữ dữ liệu; xóa nó sẽ xóa dữ liệu demo.
-- Flask debug server chỉ dùng để phát triển trên máy cá nhân, không dùng làm máy chủ production.
-- SQLite được tích hợp trong Python nên không cần cài riêng database server.
+## Ghi chú bảo mật
+- Đặt SECRET_KEY riêng trước khi triển khai.
+- Không bật Flask debug server khi triển khai ra Internet.
+- Tạo tài khoản bằng lệnh CLI; mật khẩu được lưu dạng hash.
+- CSRF bảo vệ các thao tác thay đổi dữ liệu.
+- SQLite phù hợp demo/local và quy mô nhỏ; workload ghi đồng thời lớn cần database phù hợp hơn.
 
-## Tài liệu tham khảo
-
-- [Flask Quickstart](https://flask.palletsprojects.com/en/stable/quickstart/)
-- [Flask: Define and Access the Database](https://flask.palletsprojects.com/en/stable/tutorial/database/)
-- [Flask trong VS Code](https://code.visualstudio.com/docs/python/tutorial-flask)
+## Tài liệu
+- [Flask configuration](https://flask.palletsprojects.com/en/stable/config/)
+- [Flask-WTF CSRF](https://flask-wtf.readthedocs.io/en/latest/csrf/)
+- [Flask-Login](https://flask-login.readthedocs.io/)
